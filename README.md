@@ -1,265 +1,914 @@
-# AIRBOOK PH
+# ✈️ AIRBOOK PH
 
-Full-stack airline booking system for MCP Side Project 1.
-
-This repository contains the Technical Specification Document (TSD), project references, and development files for the AIRBOOK PH Airline Booking System.
+### Technical Specifications Document (TSD)
 
 ---
 
-# Technical Specifications Document
+# Version 1.6 (Revised Detailed Edition)
+
+---
 
 ## 1. Title Page
 
-- **Project Name**: **AIRBOOK PH** Airline Booking System
-- **Version**: 1.3 (Revised)
-- **Date**: April 17, 2026
-- **Author(s)**: Chinee Marasigan, Shae Padilla
+| Field | Details |
+|---|---|
+| Project Name | AIRBOOK PH – Airline Booking System |
+| Document Type | Technical Specifications Document |
+| Version | 1.6 |
+| Date | April 2026 |
+| Authors | Chinee Marasigan & Shae Padilla |
+| Project Type | Web-Based Airline Booking System |
+
+---
 
 ## 2. Table of Contents
 
 1. [Introduction](#3-introduction)
 2. [Overall Description](#4-overall-description)
-3. [Visual Mockup Reference](#5-visual-mockup-reference)
-4. [Features](#6-features)
-5. [Functional Requirements](#7-functional-requirements)
-6. [Non-Functional Requirements](#8-non-functional-requirements)
-7. [Data Requirements](#9-data-requirements)
-8. [External Interface Requirements](#10-external-interface-requirements)
-9. [Glossary](#11-glossary)
-10. [Appendices](#12-appendices)
+3. [Technology Stack](#5-technology-stack)
+4. [Visual Mockup Reference](#6-visual-mockup-reference)
+5. [Features](#7-features)
+6. [Functional Requirements](#8-functional-requirements)
+7. [Non-Functional Requirements](#9-non-functional-requirements)
+8. [Data Requirements](#10-data-requirements)
+9. [External Interface Requirements](#11-external-interface-requirements)
+10. [API Endpoints](#12-api-endpoints)
+11. [Security and Validation Rules](#13-security-and-validation-rules)
+12. [Glossary](#14-glossary)
+13. [Appendices](#15-appendices)
+14. [Revision History](#16-revision-history)  
 
-## 3. Introduction
+---
 
-- **Purpose**: Define the technical, functional, and operational scope of AIRBOOK PH as a full-stack airline booking platform for guests, registered travelers, and one Super Admin.
+# 3. Introduction
 
-- **Scope**: Covers frontend and backend modules for user authentication, flight discovery, seat selection, seat hold, booking, payments, ticket retrieval, booking checker, and Super Admin management. Excludes live airline integrations, real-time flight tracking, and production airline settlement systems.
+## 3.1 Purpose
 
-- **References**:
-  - Figma airline booking mockup
-  - Project repository structure
-  - Backend route and service implementation
-  - Approved TSD section pattern
+AIRBOOK PH is a web-based airline booking system designed to simulate a simplified airline reservation workflow. The project focuses on providing users with a secure and user-friendly booking experience through modern web technologies.
 
-- **Definitions, Acronyms, and Abbreviations**:
-  - **JWT**: JSON Web Token used for stateless authentication.
-  - **Bcrypt**: Password hashing library for secure credential storage.
-  - **PNR**: Passenger Name Record or booking reference used to retrieve reservations.
-  - **CRUD**: Create, Read, Update, Delete operations for managed entities.
-  - **Seat Hold**: Temporary reservation lock placed on seats before booking confirmation.
-  - **Seat Assignment**: Array of selected seat identifiers stored in the booking record.
-  - **Audit Log**: Administrative activity record used for accountability and traceability.
+The system allows users to:
 
-## 4. Overall Description
+- Create and manage accounts
+- Search available domestic flights
+- Select seats
+- Enter passenger information
+- Create and manage bookings
+- Retrieve itinerary details using booking references
 
-- **Product Perspective**: AIRBOOK PH is a full-stack web application composed of a customer-facing frontend and a backend API connected to MongoDB and Redis. It supports a guided booking funnel for travelers and a protected admin console for one Super Admin.
+The project also demonstrates the practical implementation of:
 
-- **Product Functions**:
-  - Register and authenticate users
-  - Search available flights
-  - Select seats and place temporary seat holds
-  - Complete bookings and simulated payment flow
-  - Retrieve bookings and ticket details
-  - Manage flights, bookings, users, payments, and audit logs through the Super Admin console
+- RESTful API architecture
+- Authentication and authorization
+- MongoDB document relationships
+- Responsive frontend development
+- Modular backend development
 
-- **User Classes and Characteristics**:
-  - **Guest User**: Can browse public content, search flights, and view booking-related pages that do not require authentication.
-  - **Registered Traveler**: Can access booking, payment, ticket retrieval, booking checker, and personal booking history features.
-  - **Super Admin**: Has full administrative access to manage flights, bookings, users, payments or refunds, and audit logs.
+---
 
-- **Operating Environment**:
-  - **Frontend**: Modern browsers for desktop and mobile devices
-  - **Backend**: Node.js and Express.js runtime environment
-  - **Database**: MongoDB with Mongoose ODM
-  - **Caching / Timed Holds**: Redis for expiry-based seat hold support
+## 3.2 Project Scope
 
-- **Assumptions and Dependencies**:
-  - Stable internet connection is available
-  - MongoDB and Redis services are operational
-  - Environment variables are configured correctly
-  - Payment flow is implemented for project purposes and may be simulated depending on project scope
+The scope of the Minimum Viable Product (MVP) focuses on the core airline booking workflow.
 
-## 5. Visual Mockup Reference
+### Included in MVP
 
-- **Figma Reference**: Airline Booking System Mock-up
+- User registration and login
+- Authentication using JWT
+- Flight search and listing
+- Seat selection
+- Passenger information collection
+- Booking creation
+- Booking retrieval and management
+- Admin flight management
+- Admin booking management
 
-- **Design Description**: The interface follows a clean, modern, and calming design direction. Spacious layouts, cool tones, and intuitive navigation are used to create a smoother booking experience. The design emphasizes booking clarity, readable fare information, and confidence during multi-step reservation flows.
+### Excluded from MVP
 
-- **Design Specs**:
-  - **Primary Palette**: Travel-oriented blues with restrained accent colors for success, warning, and destructive states
-  - **Typography**: Readable UI hierarchy for fares, booking references, schedules, and form-heavy checkout flows
-  - **Layout**: Mobile-first structure with responsive spacing and booking-focused content blocks
-  - **Admin Interface Style**: Dense but readable operational tables, filters, and confirmation modals rather than marketing-style layouts
+The following features are considered future enhancements and are not part of the initial implementation:
 
-## 6. Features
+- Online payment gateway integration
+- Automated ticket generation
+- Real-time seat hold expiration system
+- Refund processing
+- Multi-airline integration
+- Email notifications
 
-- **Secure User Authentication**: Guest registration, login, token-based sessions, and protected access to private booking and account flows.
+This scope limitation ensures that development remains achievable within the project timeline while maintaining a scalable architecture for future expansion.
 
-- **Dynamic Flight Search**: Search and filter available flights by route, date, and travel options with responsive result cards.
+---
 
-- **Seat Map and Seat Hold Flow**: Allows travelers to select seats and temporarily lock them before booking confirmation to reduce double-booking risk.
+## 3.3 Objectives
 
-- **Validated Booking and Payment Flow**: Captures passenger details, confirms booking data, and processes payment with booking state synchronization.
+The project aims to:
 
-- **Manage Booking and Checker**: Allows authenticated users or checker users to retrieve booking details and status.
+- Provide a smooth airline booking workflow
+- Prevent booking conflicts through seat tracking
+- Demonstrate secure authentication practices
+- Apply MongoDB referencing and embedded document concepts
+- Create a responsive and modern web application
+- Establish a scalable foundation for future airline system enhancements
 
-- **Ticket and Booking Success Views**: Displays completed reservation outcomes and ticket-related retrieval after confirmed purchase.
+---
 
-- **Super Admin Operations Dashboard**: Provides operational monitoring across bookings, flights, users, payments, refunds, and audit logs.
+# 4. Overall Description
 
-- **Super Admin CRUD Management**: Supports controlled create, read, update, and delete operations for flights, bookings, users, and payment-related administration with audit capture.
+## 4.1 Product Perspective
 
-## 7. Functional Requirements
+AIRBOOK PH is a standalone web application composed of:
 
-### 7.1 System Features
+- Frontend client application
+- Backend REST API server
+- MongoDB database
 
-| System Feature | Capability Summary |
+The system follows a client-server architecture where the frontend communicates with the backend API for all booking and authentication operations.
+
+---
+
+## 4.2 Product Functions
+
+The system supports the following major functions:
+
+### User Authentication
+
+- User registration
+- User login/logout
+- JWT-based authentication
+- Password hashing using bcrypt
+
+### Flight Search and Retrieval
+
+- Search flights by route and departure date
+- Display available flights
+- Display available seats
+- View flight schedules and fares
+
+### Booking Management
+
+- Select seats
+- Enter passenger information
+- Create booking records
+- Retrieve booking details
+- View booking dashboard
+- Cancel bookings
+
+### Administrative Functions
+
+- Create flights
+- Update flights
+- Remove flights
+- Manage bookings
+- Manage user accounts
+
+---
+
+## 4.3 User Classes and Characteristics
+
+### Guest User
+
+A visitor without an account.
+
+Capabilities:
+
+- View landing page
+- Search available flights
+- Access booking checker
+- Register an account
+
+Restrictions:
+
+- Cannot create bookings
+- Cannot manage itineraries
+
+---
+
+### Registered User
+
+A verified customer with an account.
+
+Capabilities:
+
+- Login securely
+- Search flights
+- Select seats
+- Create bookings
+- Manage bookings
+- View booking details
+
+---
+
+### Admin User
+
+System administrator responsible for system management.
+
+Capabilities:
+
+- Manage flights
+- Manage bookings
+- Manage user records
+- Monitor seat availability
+
+---
+
+# 5. Technology Stack
+
+## 5.1 Frontend Technologies
+
+| Technology | Purpose |
 |---|---|
-| Authentication and Access | Registers users, authenticates sessions, protects private routes, and restricts admin functions to the Super Admin. |
-| Flight Discovery | Retrieves flight results, pricing, and schedules for search-driven booking decisions. |
-| Seat Inventory Control | Creates temporary seat holds, tracks hold expiry, and prevents duplicate seat assignment during checkout. |
-| Booking Lifecycle | Moves reservations through pending payment, confirmed, and cancelled states with validation rules. |
-| Payment Management | Stores payment records, supports status tracking, and exposes refund operations for the Super Admin when needed. |
-| Super Admin CRUD Operations | Enables the Super Admin to create, read, update, or delete operational data with audit logging and authorization checks. |
+| Next.js | Frontend framework and routing |
+| React | UI component rendering |
+| CSS Modules | Scoped component styling |
+| Axios | API communication between frontend and backend |
 
-### 7.2 Detailed Use Cases
+### Frontend Responsibilities
 
-| ID | Title | Primary Actor | Description |
-|-------|-------------------------------------------|-------------------------------------|--------------------------------------------------------------------------------|
-| UC-01 | User Registration and Login               | Guest User                          | Create account, authenticate, and receive protected access to booking features.                               |
-| UC-02 | Search and Select Flight                  | Guest User or Registered Traveler   | Search flights, inspect results, and choose a flight for booking.                                             |
-| UC-03 | Select Seats and Hold Before Checkout     | Registered Traveler                 | Select seats, temporarily reserve inventory, and continue to checkout.                                        |
-| UC-04 | Complete Booking and Payment              | Registered Traveler                 | Submit passenger details, confirm payment, and generate booking and ticket records.                           |
-| UC-05 | Retrieve Booking via Dashboard or Checker | Registered Traveler or Checker User | View reservation details through account access or reference lookup.                                          |
-| UC-06 | Super Admin Flight Management             | Super Admin                         | Create flights, read flight lists, update schedules, fares, and status, and deactivate flights when needed.   |
-| UC-07 | Super Admin Booking Operations            | Super Admin                         | Read bookings, update booking or payment states, and cancel bookings while releasing resources when required. |
-| UC-08 | Super Admin User Management               | Super Admin                         | Read user records, update roles or status, and deactivate user access under authorization rules.              |
-| UC-09 | Super Admin Refund and Audit Review       | Super Admin                         | Trigger refunds for eligible payments and inspect audit logs for operational accountability.                  |
+- Render user interface
+- Handle client-side validation
+- Manage user sessions
+- Consume REST API endpoints
+- Display booking and flight information
 
-### 7.3 Super Admin CRUD Management Rules
+---
 
-| Domain | Operation | Behavior |
-|----------|---------------------|---------------------------------------------------------------------------------------------------------------------|
-| Flights  | Create              | Add new flight schedule, fare, capacity, and route metadata.                                                        |
-| Flights  | Read                | View paginated flight lists and filter by status.                                                                   |
-| Flights  | Update              | Modify route, times, fares, seat counts, and operational status.                                                    |
-| Flights  | Deactivate / Delete | Deactivate or delete flights only when no active bookings are attached; status retirement is preferred when needed. |
-| Bookings | Read                | View booking lists with booking and payment status filters.                                                         |
-| Bookings | Update              | Adjust booking status, payment status, and ticket status with business-rule validation.                             |
-| Bookings | Cancel              | Cancel bookings and release held seats or resources instead of hard-deleting transactional history.                 |
-| Users    | Read                | View user list with status visibility.                                                                              |
-| Users    | Update              | Change user status and selected account fields according to authorization rules.                                    |
-| Users    | Deactivate          | Deactivate user access according to policy and authorization.                                                       |
-| Payments | Read                | Review payment records and status history.                                                                          |
-| Payments | Refund              | Issue Super Admin-triggered refunds with reason capture and audit log entries.                                      |
+## 5.2 Backend Technologies
 
-## 8. Non-Functional Requirements
+| Technology | Purpose |
+|---|---|
+| Node.js | Runtime environment |
+| Express.js | Backend server framework |
 
-| Category       | Requirement                                                                                                                              |
-|----------------|------------------------------------------------------------------------------------------------------------------------------------------|
-| Performance    | Support high-volume search and booking traffic, with target readiness for around 1,000 concurrent users under optimized infrastructure.  |
-| Security       | Use Bcrypt for password hashing, JWT for authentication, protected environment variables, and auditable admin actions.                   |
-| Usability      | Provide mobile-responsive booking flows, clear feedback states, readable schedules and fares, and intuitive booking and admin workflows. |
-| Reliability    | Preserve booking, seat inventory, and payment state consistency even during cancellation, refund, or expiry events.                      |
-| Supportability | Maintain modular frontend and backend codebases with separated services, controllers, routes, stores, and test coverage areas.           |
+### Backend Responsibilities
 
-## 9. Data Requirements
+- Process API requests
+- Validate incoming data
+- Authenticate users
+- Manage business logic
+- Handle booking operations
+- Interact with MongoDB database
 
-### 9.1 Data Models
+---
 
-- **User**: identity, contact information, hashed password, role, status, and account context
-- **Flight**: airline ID, flight number, route, departure and arrival times, base fare, seat capacity, available seats, and operational status
-- **Booking**: booking reference, user ID, flight ID, `seatAssignment: [String]`, `passengerDetails: [Object]`, fare breakdown, booking status, payment status, and ticket status
-- **Payment**: booking linkage, provider, amount, payment status, and refund-related metadata
-- **SeatHold**: temporary seat reservation state, expiry time, user linkage, selected seat identifiers, and associated booking linkage
-- **SeatInventory**: per-seat availability state, heldBy user, hold expiry, and booking linkage
-- **Ticket**: issued ticket records associated with confirmed bookings
-- **AdminAuditLog**: Super Admin action trail containing actor, entity, action, reason, and metadata
-- **Airline**: carrier information linked to flights through `airlineID`
+## 5.3 Database
 
-### 9.2 Database Requirements
+| Technology | Purpose |
+|---|---|
+| MongoDB | NoSQL database |
+| Mongoose ODM | Schema modeling and validation |
 
-- Password security through hashed password storage
-- ObjectID-based references between users, flights, bookings, payments, seat holds, tickets, and airlines
-- Data aggregation and relation stitching through Mongoose population and aggregation pipelines where needed
-- Environment-based configuration for database, Redis, JWT, and payment provider settings
-- Transactional safety patterns for booking cancellation, refund operations, and seat release updates
-- Audit-trail persistence for privileged Super Admin changes
+### Database Responsibilities
 
-### 9.3 ERD Summary
+- Store users
+- Store flights
+- Store bookings
+- Maintain entity relationships
+- Track seat availability
 
-- A user can own many bookings.
-- Each booking references exactly one flight.
-- A booking may include multiple passengers and multiple selected seats.
-- Payments and tickets are associated to bookings.
-- SeatHold and SeatInventory support reservation locking.
-- Airline is linked to flights through `airlineID`.
-- AdminAuditLog records privileged changes executed by the Super Admin.
+---
 
-## 10. External Interface Requirements
+## 5.4 Security Technologies
 
-### 10.1 User Interfaces
+| Technology | Purpose |
+|---|---|
+| JWT | Authentication token generation |
+| Bcrypt | Password hashing |
 
-- Public homepage with search-first hero section and promotional travel content
-- Authentication pages for registration and login
-- Search results and flight detail selection views
-- Booking flow screens for seat selection, passenger input, payment, and success state
-- Checker and booking history views for retrieval of reservations
-- Super Admin dashboard and manager pages for flights, bookings, users, payments, and audit logs
+### Security Responsibilities
 
-### 10.2 API Interfaces
+- Secure user authentication
+- Protect private endpoints
+- Encrypt user passwords
+- Validate authenticated sessions
 
-| API Group     | Responsibility                                                                                |
-|---------------|-----------------------------------------------------------------------------------------------|
-| Auth API      | Register, login, and protected session flows                                                  |
-| Flights API   | Flight search and availability retrieval                                                      |
-| Seat Hold API | Seat locking and expiry-sensitive reservation control                                         |
-| Bookings API  | Booking creation, retrieval, update, and cancellation flows                                   |
-| Payments API  | Payment initiation, status persistence, and refund support                                    |
-| Tickets API   | Ticket retrieval after booking confirmation                                                   |
-| Checker API   | Reservation lookup by reference                                                               |
-| Admin API     | Dashboard metrics plus CRUD management for flights, bookings, users, payments, and audit logs |
+---
 
-### 10.3 Super Admin Endpoint Pattern
+# 6. Visual Mockup Reference
 
-| Endpoint                        | Purpose                                            |
-|---------------------------------|----------------------------------------------------|
-| GET /admin/flights              | Read paginated flight data                         |
-| POST /admin/flights             | Create flight record                               |
-| PATCH /admin/flights/:id        | Update flight data                                 |
-| DELETE /admin/flights/:id       | Delete or deactivate eligible flight record        |
-| GET /admin/bookings             | Read booking operations list                       |
-| PATCH /admin/bookings/:id       | Update booking lifecycle state                     |
-| DELETE /admin/bookings/:id      | Cancel booking and release resources               |
-| GET /admin/users                | Read user management list                          |
-| PATCH /admin/users/:id          | Update user status or selected account fields      |
-| DELETE /admin/users/:id         | Deactivate user record per policy                  |
-| GET /admin/payments             | Read payment records                               |
-| POST /admin/payments/:id/refund | Execute refund operation                           |
-| GET /admin/audit-logs           | Read audit trail entries                           |
+## Figma Mockup
 
-## 11. Glossary
+The frontend user interface design is based on the approved Figma prototype.
 
-| Term                   | Definition |
-|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Airline Booking System | A full-stack web application that allows users to search, reserve, pay for, and manage flights while enabling the Super Admin to manage flight data and system actions. |
-| Super Admin Dashboard  | Administrative control interface for metrics, approvals, updates, refunds, and data management.                                                                         |
-| CRUD Management        | Controlled create, read, update, and delete workflows used by the Super Admin to maintain operational entities.                                                         |
-| Audit Log              | Traceable record of privileged actions performed by the Super Admin.                                                                                                    |
-| Booking Checker        | Feature that retrieves reservation details using a booking reference or related lookup data.                                                                            |
+Figma Link:
 
-## 12. Appendices
+https://www.figma.com/design/F4fPWoBoTkl1y6iyxX5SEI/AirBook-PH---MCP--My-Copy-?node-id=0-1&t=NzQMxCPaBmnVCtVX-1
 
-### 12.1 Supporting Information
+The mockup includes:
 
-- Frontend and backend repository structure were reviewed to align this TSD with actual implementation areas.
-- This document should be paired with the latest ERD diagram, API contract appendix, and booking lifecycle diagram in later revisions if needed.
+- Landing page
+- Login and registration pages
+- Flight search interface
+- Seat selection interface
+- Passenger details form
+- Booking dashboard
+- Booking checker page
+- Payment placeholder page
+- Receipt layout
 
-### 12.2 Revision History
+---
 
-| Version | Date       | Summary                                                                                                                                                             |
-|---------|------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 1.0     | 2026-04-13 | Refactored TSD structure and explicitly added admin CRUD management pattern across features, functional requirements, and interface sections.                       |
-| 1.2     | 2026-04-15 | Feedback-based cleanup for section ordering and wording.                                                                                                            |
-| 1.3     | 2026-04-17 | Revised to use one Super Admin, aligned booking data with seatAssignment array, clarified seat map support, and synchronized wording with the latest reviewed plan. |
+# 7. Features
 
-_End of Technical Specification Document_
+## 7.1 MVP Features
+
+### Secure Authentication
+
+- User registration
+- Login and logout
+- JWT authentication
+- Password encryption
+
+### Flight Search System
+
+- Search flights by route
+- Display available flights
+- Display schedules and pricing
+
+### Seat Selection
+
+- Visual seat map interface
+- Seat assignment per passenger
+- Seat availability tracking
+
+### Booking System
+
+- Passenger information collection
+- Booking reference generation
+- Booking storage and retrieval
+
+### Booking Management
+
+- View booking details
+- Retrieve itinerary using booking reference
+- Cancel bookings
+
+---
+
+## 7.2 Future Enhancements
+
+### Payment Integration
+
+Future integration with Stripe or similar payment gateway.
+
+### Ticket Generation
+
+Automatic ticket generation after successful payment.
+
+### Seat Hold System
+
+Temporary seat reservation timer before checkout completion.
+
+---
+
+# 8. Functional Requirements
+
+## Use Case 1: User Registration
+
+### Description
+
+Allows new users to create accounts.
+
+### Actors
+
+- Guest User
+
+### Preconditions
+
+- User is not yet registered.
+
+### Workflow
+
+1. User enters registration details.
+2. System validates required fields.
+3. System checks for duplicate email.
+4. Password is encrypted using bcrypt.
+5. User record is stored in MongoDB.
+6. System returns successful registration response.
+
+### Expected Result
+
+User account is successfully created.
+
+---
+
+## Use Case 2: User Login
+
+### Description
+
+Allows registered users to access the system.
+
+### Actors
+
+- Registered User
+
+### Preconditions
+
+- User account exists.
+
+### Workflow
+
+1. User enters email and password.
+2. System validates credentials.
+3. JWT token is generated.
+4. Token is returned to frontend.
+5. User gains authenticated access.
+
+### Expected Result
+
+User successfully logs into the system.
+
+---
+
+## Use Case 3: Flight Search
+
+### Description
+
+Allows users to search available flights.
+
+### Actors
+
+- Guest User
+- Registered User
+
+### Preconditions
+
+- Flight records exist in the database.
+
+### Workflow
+
+1. User selects origin and destination.
+2. User selects departure date.
+3. System retrieves matching flights.
+4. Available flights are displayed.
+
+### Expected Result
+
+User sees matching available flights.
+
+---
+
+## Use Case 4: Seat Selection
+
+### Description
+
+Allows users to select available seats.
+
+### Actors
+
+- Registered User
+
+### Preconditions
+
+- Flight has available seats.
+
+### Workflow
+
+1. User opens seat map.
+2. System displays available seats.
+3. User selects seat(s).
+4. Selected seat codes are stored.
+
+### Expected Result
+
+Seat assignment is linked to the booking.
+
+---
+
+## Use Case 5: Booking Creation
+
+### Description
+
+Allows users to finalize booking details.
+
+### Actors
+
+- Registered User
+
+### Preconditions
+
+- Flight and seats are selected.
+
+### Workflow
+
+1. User enters passenger details.
+2. System validates passenger information.
+3. Booking reference is generated.
+4. Booking record is stored.
+5. Seat availability count is updated.
+
+### Expected Result
+
+Booking is successfully created.
+
+---
+
+## Use Case 6: Booking Retrieval
+
+### Description
+
+Allows users to retrieve booking details.
+
+### Actors
+
+- Guest User
+- Registered User
+
+### Preconditions
+
+- Valid booking reference exists.
+
+### Workflow
+
+1. User enters booking reference and last name.
+2. System validates booking information.
+3. System retrieves booking details.
+4. Booking itinerary is displayed.
+
+### Expected Result
+
+Booking information is successfully retrieved.
+
+---
+
+# 9. Non-Functional Requirements
+
+## Performance
+
+- API response time should remain fast under normal usage.
+- Flight search results should load efficiently.
+- Database queries should be optimized.
+
+---
+
+## Security
+
+- Passwords must be hashed using bcrypt.
+- JWT tokens must protect secured routes.
+- Sensitive routes require authentication.
+- Input validation must be implemented.
+
+---
+
+## Usability
+
+- User interface must be responsive.
+- Navigation should remain simple and intuitive.
+- Booking workflow should minimize unnecessary steps.
+
+---
+
+## Reliability
+
+- System should properly update seat availability.
+- Booking records should remain consistent.
+- Invalid requests should return proper error handling.
+
+---
+
+## Maintainability
+
+- Backend should follow modular architecture.
+- Components should be reusable.
+- Database schemas should support future scalability.
+
+---
+
+# 10. Data Requirements
+
+## 10.1 ERD Structure
+
+### ERD 1 (MVP)
+
+https://app.moqups.com/EN8380imW6sj1R9WzaXPj9HkuKREfei8/view/page/ad4e74bdc?ui=0
+
+### Included Entities
+
+- Users
+- Flights
+- Bookings
+
+---
+
+### ERD 2 (Future Enhancements)
+
+https://app.moqups.com/EN8380imW6sj1R9WzaXPj9HkuKREfei8/view/page/a2c6c029b
+
+### Included Entities
+
+- Payment
+- Ticket
+
+---
+
+## 10.2 Seat Assignment Design Decision
+
+To simplify the MVP architecture, seat data is stored directly within the booking document.
+
+Example:
+
+```json
+selectedSeats: ["4F", "5A"]
+```
+
+Passenger data is embedded inside the booking collection:
+
+```json
+passengers: [
+  {
+    "firstName": "Juan",
+    "lastName": "Dela Cruz",
+    "seatNumber": "4F",
+    "passportNumber": "optional"
+  }
+]
+```
+
+This approach:
+
+- Reduces database complexity
+- Removes the need for separate passenger collections
+- Simplifies booking retrieval
+- Supports multiple passengers per booking
+
+---
+
+## 10.3 Users Collection
+
+```json
+{
+  "_id": "ObjectId",
+  "firstName": "string",
+  "lastName": "string",
+  "email": "string",
+  "password": "Hashed String",
+  "isAdmin": "boolean",
+  "mobileNumber": "string",
+  "createdAt": "date",
+  "updatedAt": "date"
+}
+```
+
+---
+
+## 10.4 Flights Collection
+
+```json
+{
+  "_id": "ObjectId",
+  "airlineCode": "string",
+  "flightNumber": "string",
+  "origin": "string",
+  "destination": "string",
+  "departureTime": "date",
+  "arrivalTime": "date",
+  "baseFare": "number",
+  "seatCapacity": "number",
+  "seatsAvailable": "number",
+  "flightStatus": "string",
+  "createdAt": "date",
+  "updatedAt": "date"
+}
+```
+
+---
+
+## 10.5 Bookings Collection (MVP)
+
+```json
+{
+  "_id": "ObjectId",
+  "bookingReference": "string",
+  "userID": "ObjectId",
+  "flightID": "ObjectId",
+  "selectedSeats": ["string"],
+  "passengers": ["object"],
+  "totalFare": "number",
+  "bookingStatus": "string",
+  "createdAt": "date",
+  "updatedAt": "date"
+}
+```
+
+---
+
+## 10.6 Payment Collection (Future)
+
+```json
+{
+  "_id": "ObjectId",
+  "bookingId": "ObjectId",
+  "paymentMethod": "string",
+  "amount": "number",
+  "paymentStatus": "string",
+  "createdAt": "date",
+  "updatedAt": "date"
+}
+```
+
+---
+
+## 10.7 Ticket Collection (Future)
+
+```json
+{
+  "_id": "ObjectId",
+  "paymentId": "ObjectId",
+  "ticketNumber": "string",
+  "isPaid": "boolean",
+  "issuedAt": "date",
+  "createdAt": "date",
+  "updatedAt": "date"
+}
+```
+
+---
+
+## 10.8 Key Design Decisions
+
+- MongoDB ObjectID referencing is used for entity relationships.
+- Payment and Ticket entities are separated from MVP scope.
+- Passenger information is embedded inside bookings.
+- Seat numbers are stored as arrays of strings.
+- Ticket generation occurs only after successful payment.
+- Flight availability is tracked using seatsAvailable.
+
+---
+
+## 10.9 Entity Relationship Summary
+
+| Relationship | Description |
+|---|---|
+| One User → Many Bookings | A user can create multiple bookings |
+| One Flight → Many Bookings | Multiple users may book the same flight |
+| Booking → Payment | Payment linked after booking creation |
+| Payment → Ticket | Ticket generated after successful payment |
+
+---
+
+# 11. External Interface Requirements
+
+## 11.1 User Interfaces
+
+### Landing Page
+
+Displays search functionality and featured flights.
+
+### Login and Registration Pages
+
+Handles secure authentication.
+
+### Flight Search Page
+
+Displays available flights and schedules.
+
+### Seat Selection Page
+
+Displays visual seat map.
+
+### Booking Dashboard
+
+Displays user bookings and itinerary details.
+
+### Booking Checker
+
+Allows retrieval using booking reference.
+
+---
+
+## 11.2 API Interfaces
+
+The backend exposes RESTful API endpoints for:
+
+- Authentication
+- Flight management
+- Booking management
+- User management
+
+Frontend communicates with backend using Axios.
+
+---
+
+# 12. API Endpoints
+
+## Authentication
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /users/register | Register new user |
+| POST | /users/login | Authenticate user |
+
+---
+
+## Flights
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /flights | Retrieve flights |
+| GET | /flights/:id | Retrieve flight details |
+
+---
+
+## Bookings
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /bookings | Create booking |
+| GET | /bookings/:id | Retrieve booking |
+| PATCH | /bookings/:id | Update booking |
+| DELETE | /bookings/:id | Cancel booking |
+
+---
+
+## Admin – Flights
+
+| Method | Endpoint |
+|---|---|
+| GET | /admin/flights |
+| POST | /admin/flights |
+| PATCH | /admin/flights/:id |
+| DELETE | /admin/flights/:id |
+
+---
+
+## Admin – Bookings
+
+| Method | Endpoint |
+|---|---|
+| GET | /admin/bookings |
+| PATCH | /admin/bookings/:id |
+| DELETE | /admin/bookings/:id |
+
+---
+
+## Admin – Users
+
+| Method | Endpoint |
+|---|---|
+| GET | /admin/users |
+| PATCH | /admin/users/:id |
+| DELETE | /admin/users/:id |
+
+---
+
+# 13. Security and Validation Rules
+
+## Authentication Rules
+
+- JWT tokens required for protected routes
+- Invalid tokens denied access
+- Passwords stored only as hashed values
+
+---
+
+## Booking Rules
+
+- Seats cannot exceed available seat count
+- Passenger count must match selected seats
+- Booking reference must remain unique
+
+---
+
+## Validation Rules
+
+- Required fields cannot be empty
+- Email must follow valid format
+- Password minimum length validation
+- Flight dates must be valid
+
+---
+
+# 14. Glossary
+
+| Term | Definition |
+|---|---|
+| Booking Reference | Unique booking identifier |
+| Collection | MongoDB equivalent of a table |
+| Document | MongoDB record |
+| Field | Individual data attribute |
+| JWT | JSON Web Token used for authentication |
+| API | Application Programming Interface |
+| ODM | Object Data Modeling |
+
+---
+
+# 15. Appendices
+
+## Future Enhancements
+
+### Payment Integration
+
+Future integration with Stripe or other online payment providers.
+
+### Ticket Generation
+
+Automatic ticket issuance after successful payment.
+
+### Seat Hold System
+
+Temporary seat reservation expiration timer.
+
+---
+
+# 16. Revision History
+
+| Version | Changes |
+|---|---|
+| v1.5 | Simplified MVP structure and separated future entities |
+| v1.6 | Expanded functional details, elaborated workflows, improved documentation structure |
