@@ -15,7 +15,7 @@
 | Project Name | AIRBOOK PH – Airline Booking System |
 | Document Type | Technical Specifications Document |
 | Version | 1.7 |
-| Date | April 2026 |
+| Date | May 2026 |
 | Authors | Chinee Marasigan & Shae Padilla |
 | Project Type | Web-Based Airline Booking System |
 
