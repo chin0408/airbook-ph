@@ -4,7 +4,7 @@
 
 ---
 
-# Version 1.6 (Revised Detailed Edition)
+# Version 1.7 (Feedback Revision Edition)
 
 ---
 
@@ -14,7 +14,7 @@
 |---|---|
 | Project Name | AIRBOOK PH – Airline Booking System |
 | Document Type | Technical Specifications Document |
-| Version | 1.6 |
+| Version | 1.7 |
 | Date | April 2026 |
 | Authors | Chinee Marasigan & Shae Padilla |
 | Project Type | Web-Based Airline Booking System |
@@ -310,34 +310,62 @@ The mockup includes:
 
 ### Secure Authentication
 
-- User registration
-- Login and logout
-- JWT authentication
-- Password encryption
+Provides secure account access and protected user sessions using encrypted credentials and JWT authentication.
+
+- User registration with password hashing using bcrypt
+- Login using JWT authentication
+- Logout functionality
+- Password encryption and validation
+
+---
 
 ### Flight Search System
 
-- Search flights by route
+Allows users to search and browse available domestic flights based on selected routes and schedules.
+
+- Search flights by route and schedule
 - Display available flights
 - Display schedules and pricing
 
+---
+
 ### Seat Selection
+
+Provides an interactive seat map interface for selecting and tracking available seats.
 
 - Visual seat map interface
 - Seat assignment per passenger
 - Seat availability tracking
 
+---
+
 ### Booking System
+
+Handles passenger information collection and booking creation for selected flights.
 
 - Passenger information collection
 - Booking reference generation
 - Booking storage and retrieval
 
+---
+
 ### Booking Management
+
+Allows users to retrieve and manage existing booking records and itineraries.
 
 - View booking details
 - Retrieve itinerary using booking reference
 - Cancel bookings
+
+---
+
+### Responsive User Interface
+
+Provides mobile-friendly and responsive layouts for desktop and mobile users.
+
+- Responsive flight listings
+- Mobile seat selection support
+- Adaptive booking forms
 
 ---
 
@@ -675,8 +703,8 @@ This approach:
 {
   "_id": "ObjectId",
   "bookingReference": "string",
-  "userID": "ObjectId",
-  "flightID": "ObjectId",
+  "userId": "ObjectId",
+  "flightId": "ObjectId",
   "selectedSeats": ["string"],
   "passengers": ["object"],
   "totalFare": "number",
@@ -748,11 +776,11 @@ This approach:
 
 ### Landing Page
 
-Displays search functionality and featured flights.
+Displays flight search functionality and featured flights.
 
 ### Login and Registration Pages
 
-Handles secure authentication.
+Handles secure user authentication.
 
 ### Flight Search Page
 
@@ -811,6 +839,7 @@ Frontend communicates with backend using Axios.
 |---|---|---|
 | POST | /bookings | Create booking |
 | GET | /bookings/:id | Retrieve booking |
+| GET | /bookings/reference/:bookingReference | Retrieve booking using booking reference |
 | PATCH | /bookings/:id | Update booking |
 | DELETE | /bookings/:id | Cancel booking |
 
@@ -890,19 +919,9 @@ Frontend communicates with backend using Axios.
 
 # 15. Appendices
 
-## Future Enhancements
+## Version History Reference
 
-### Payment Integration
-
-Future integration with Stripe or other online payment providers.
-
-### Ticket Generation
-
-Automatic ticket issuance after successful payment.
-
-### Seat Hold System
-
-Temporary seat reservation expiration timer.
+Additional revisions and documentation updates are tracked under the Revision History section.
 
 ---
 
@@ -912,3 +931,4 @@ Temporary seat reservation expiration timer.
 |---|---|
 | v1.5 | Simplified MVP structure and separated future entities |
 | v1.6 | Expanded functional details, elaborated workflows, improved documentation structure |
+| v1.7 | Added authentication enhancements, improved MVP feature descriptions, simplified appendices, refined API documentation, and applied project feedback revisions |
