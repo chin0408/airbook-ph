@@ -838,7 +838,7 @@ Frontend communicates with backend using Axios.
 | Method | Endpoint | Description |
 |---|---|---|
 | POST | /bookings | Create booking |
-| GET | /bookings/:id | Retrieve booking |
+| GET | /bookings/id/:id | Retrieve booking |
 | GET | /bookings/reference/:bookingReference | Retrieve booking using booking reference |
 | PATCH | /bookings/:id | Update booking |
 | DELETE | /bookings/:id | Cancel booking |
