@@ -128,11 +128,11 @@ export default function AdminPage() {
   const [showUserForm, setShowUserForm] = useState(false);
   const [editingUser, setEditingUser] = useState(null);
   const [userForm, setUserForm] = useState({
-    firstName: "", lastName: "", email: "", mobileNumber: "", isAdmin: false,
+    firstName: "", lastName: "", email: "", mobileNumber: "", isAdmin: false, newPassword: "",
   });
 
   const resetUserForm = () => {
-    setUserForm({ firstName: "", lastName: "", email: "", mobileNumber: "", isAdmin: false });
+    setUserForm({ firstName: "", lastName: "", email: "", mobileNumber: "", isAdmin: false, newPassword: "" });
     setEditingUser(null);
     setShowUserForm(false);
   };
@@ -145,6 +145,7 @@ export default function AdminPage() {
       email: u.email || "",
       mobileNumber: u.mobileNumber || "",
       isAdmin: u.isAdmin || false,
+      newPassword: "",
     });
     setShowUserForm(true);
   };
@@ -152,7 +153,9 @@ export default function AdminPage() {
   const handleUpdateUser = async () => {
     try {
       const token = localStorage.getItem("token");
-      await API.patch(`/admin/users/${editingUser}`, userForm, { headers: { Authorization: `Bearer ${token}` } });
+      const data = { ...userForm };
+      if (!data.newPassword) delete data.newPassword;
+      await API.patch(`/admin/users/${editingUser}`, data, { headers: { Authorization: `Bearer ${token}` } });
       resetUserForm();
       fetchData();
     } catch (error) { alert("Failed to update user"); }
@@ -538,6 +541,10 @@ export default function AdminPage() {
                       <option value="user">User</option>
                       <option value="admin">Admin</option>
                     </select>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em", color: "#8a90a8", display: "block", marginBottom: "6px" }}>RESET PASSWORD (optional)</label>
+                    <input type="password" placeholder="Leave blank to keep current" value={userForm.newPassword} onChange={(e) => setUserForm({ ...userForm, newPassword: e.target.value })} style={{ width: "100%", border: "1px solid #e3e6ef", borderRadius: "10px", padding: "10px 14px", fontSize: "14px" }} />
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "12px" }}>

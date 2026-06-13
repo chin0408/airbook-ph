@@ -18,12 +18,19 @@ const updateUser = async (req, res) => {
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ message: "User not found" });
 
-    const { firstName, lastName, email, mobileNumber, isAdmin } = req.body;
+    const { firstName, lastName, email, mobileNumber, isAdmin, newPassword } = req.body;
     if (firstName) user.firstName = firstName;
     if (lastName) user.lastName = lastName;
     if (email) user.email = email;
     if (mobileNumber !== undefined) user.mobileNumber = mobileNumber;
     if (isAdmin !== undefined) user.isAdmin = isAdmin;
+
+    // Admin password reset
+    if (newPassword && newPassword.length >= 6) {
+      const bcrypt = require("bcryptjs");
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(newPassword, salt);
+    }
 
     await user.save();
     const updated = await User.findById(req.params.id).select("-password");

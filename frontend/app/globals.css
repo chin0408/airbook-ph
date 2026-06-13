@@ -30,6 +30,29 @@ body {
   background: #ffffff;
 }
 
+/* Responsive overrides */
+@media (max-width: 768px) {
+  .hero-inner {
+    flex-direction: column !important;
+    padding: 40px 24px !important;
+  }
+  
+  .flight-card-row {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+  
+  .seat-layout {
+    flex-direction: column !important;
+  }
+  
+  .seat-sidebar {
+    width: 100% !important;
+    position: static !important;
+  }
+}
+
 /* Status badges */
 .badge {
   display: inline-block;

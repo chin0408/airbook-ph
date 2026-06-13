@@ -40,7 +40,7 @@ export default function Navbar() {
       className="w-full flex items-center justify-between sticky top-0 z-50"
       style={{
         background: "#ffffff",
-        padding: "18px 64px",
+        padding: "18px 24px",
       }}
     >
       {/* Logo */}
@@ -62,7 +62,7 @@ export default function Navbar() {
       </Link>
 
       {/* Nav Links */}
-      <div className="flex items-center" style={{ gap: "32px" }}>
+      <div className="flex items-center flex-wrap" style={{ gap: "20px" }}>
         <Link
           href="/check-booking"
           style={{

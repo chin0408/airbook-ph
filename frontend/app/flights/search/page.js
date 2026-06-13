@@ -159,7 +159,7 @@ function SearchContent() {
 
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
-      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 64px" }}>
+      <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 24px" }}>
         {/* Header */}
         <div className="flex items-start justify-between" style={{ marginBottom: "32px" }}>
           <div>
@@ -187,9 +187,9 @@ function SearchContent() {
           </button>
         </div>
 
-        <div className="flex" style={{ gap: "24px" }}>
+        <div className="flex" style={{ gap: "24px", flexWrap: "wrap" }}>
           {/* Filters Sidebar */}
-          <div style={{ width: "220px", flexShrink: 0 }}>
+          <div style={{ width: "220px", flexShrink: 0, minWidth: "200px" }}>
             <div
               style={{
                 background: "#ffffff",
@@ -269,11 +269,12 @@ function SearchContent() {
                     style={{
                       background: "#ffffff",
                       borderRadius: "16px",
-                      padding: "28px 32px",
+                      padding: "28px 24px",
                       boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                       display: "flex",
                       alignItems: "center",
-                      gap: "24px",
+                      gap: "20px",
+                      flexWrap: "wrap",
                     }}
                   >
                     {/* Airline badge */}
