@@ -62,7 +62,7 @@ export default function MyBookingsPage() {
 
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
-      <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "40px 48px 64px" }}>
+      <div style={{ maxWidth: "1000px", margin: "0 auto", padding: "32px 20px 64px" }}>
         {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "32px" }}>
           <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#15192e" }}>My Bookings</h1>

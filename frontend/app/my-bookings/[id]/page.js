@@ -69,9 +69,9 @@ export default function BookingReceiptPage({ params }) {
 
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
-      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "40px 48px 64px" }}>
+      <div style={{ maxWidth: "900px", margin: "0 auto", padding: "32px 20px 64px" }}>
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px" }}>
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: "32px", flexWrap: "wrap", gap: "16px" }}>
           <div>
             <p style={{ fontSize: "13px", fontWeight: 700, color: "#2f5af0", letterSpacing: "0.05em", marginBottom: "4px" }}>
               RECEIPT
@@ -131,7 +131,7 @@ export default function BookingReceiptPage({ params }) {
           </div>
 
           {/* PNR / Issued For / Booked On */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "24px", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid #f1f5f9" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "24px", marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid #f1f5f9" }}>
             <div>
               <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em", color: "#8a90a8", marginBottom: "4px" }}>PNR</p>
               <p style={{ fontSize: "16px", fontWeight: 800, fontFamily: "monospace", color: "#15192e" }}>{booking.bookingReference}</p>
@@ -155,7 +155,7 @@ export default function BookingReceiptPage({ params }) {
           {/* Flight Details */}
           <div style={{ marginBottom: "32px", paddingBottom: "32px", borderBottom: "1px solid #f1f5f9" }}>
             <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#15192e", marginBottom: "16px" }}>Flight details</h3>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "24px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "24px" }}>
               <div>
                 <p style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em", color: "#8a90a8", marginBottom: "4px" }}>FLIGHT</p>
                 <p style={{ fontSize: "15px", fontWeight: 600, color: "#15192e" }}>{flight?.flightNumber}</p>

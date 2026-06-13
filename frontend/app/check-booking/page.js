@@ -57,7 +57,7 @@ export default function CheckBookingPage() {
 
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
-      <div style={{ maxWidth: "780px", margin: "0 auto", padding: "56px 48px 64px" }}>
+      <div style={{ maxWidth: "780px", margin: "0 auto", padding: "40px 20px 64px" }}>
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: "36px" }}>
           <h1 style={{ fontSize: "32px", fontWeight: 800, color: "#15192e", marginBottom: "8px" }}>
@@ -174,7 +174,7 @@ export default function CheckBookingPage() {
             </div>
 
             {/* Two Column: Flight Details + Passengers/Payment */}
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "40px" }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: "40px" }}>
               {/* Flight Details */}
               <div>
                 <p style={{ fontSize: "12px", fontWeight: 700, letterSpacing: "0.05em", color: "#2f5af0", marginBottom: "16px" }}>

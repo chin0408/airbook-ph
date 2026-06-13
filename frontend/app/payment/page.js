@@ -87,7 +87,7 @@ function PaymentContent() {
 
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 48px 64px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 20px 64px" }}>
         {/* Timer */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px" }}>
           <span style={{ fontSize: "14px", color: "#6b7280" }}>⏱ Seat hold expires in</span>
@@ -97,7 +97,7 @@ function PaymentContent() {
         </div>
 
         {/* Two Column Layout */}
-        <div style={{ display: "flex", gap: "32px", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: "32px", alignItems: "flex-start", flexWrap: "wrap" }}>
           {/* Left — Secure Payment Card */}
           <div
             style={{
@@ -118,7 +118,7 @@ function PaymentContent() {
             </p>
 
             {/* Booking Reference + Pay Button */}
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "20px", marginBottom: "32px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "16px", flexWrap: "wrap", marginBottom: "32px" }}>
               <div
                 style={{
                   background: "#f8fafc",
@@ -158,7 +158,7 @@ function PaymentContent() {
           </div>
 
           {/* Right — Order Summary */}
-          <div style={{ width: "300px", flexShrink: 0 }}>
+          <div style={{ width: "300px", minWidth: "280px", flex: "1 1 300px" }}>
             <div
               style={{
                 background: "#ffffff",

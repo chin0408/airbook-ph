@@ -91,7 +91,7 @@ export default function SeatSelectionPage() {
 
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 48px 64px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 20px 64px" }}>
         {/* Back button */}
         <Link
           href={`/flights/search?from=${flight.origin}&to=${flight.destination}`}
@@ -115,11 +115,13 @@ export default function SeatSelectionPage() {
           style={{
             background: "linear-gradient(135deg, #0c1330 0%, #1c2f6e 55%, #2a4090 100%)",
             borderRadius: "16px",
-            padding: "44px 56px",
+            padding: "32px 24px",
             marginBottom: "40px",
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: "20px",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "48px" }}>
@@ -158,7 +160,7 @@ export default function SeatSelectionPage() {
         </div>
 
         {/* Select Your Seat Header + Passengers + Selected Seats (right column) */}
-        <div style={{ display: "flex", gap: "40px", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: "40px", alignItems: "flex-start", flexWrap: "wrap" }}>
           {/* Left Column: Title + Seat Map + Legend */}
           <div style={{ flex: 1 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px" }}>
@@ -302,7 +304,7 @@ export default function SeatSelectionPage() {
           </div>
 
           {/* Right Column: Selected Seats */}
-          <div style={{ width: "300px", flexShrink: 0 }}>
+          <div style={{ width: "300px", minWidth: "280px", flex: "1 1 300px" }}>
             {/* Selected Seats Card */}
             <div
               style={{
@@ -310,8 +312,6 @@ export default function SeatSelectionPage() {
                 borderRadius: "16px",
                 padding: "28px",
                 boxShadow: "0 30px 60px rgba(0, 0, 0, 0.08)",
-                position: "sticky",
-                top: "100px",
               }}
             >
               <h3 style={{ fontSize: "22px", fontWeight: 800, color: "#15192e", marginBottom: "20px" }}>

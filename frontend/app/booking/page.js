@@ -142,7 +142,7 @@ function BookingContent() {
 
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 48px 64px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 20px 64px" }}>
         {/* Timer */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
           <span style={{ fontSize: "14px", color: "#6b7280" }}>⏱ Seat hold expires in</span>
@@ -163,7 +163,7 @@ function BookingContent() {
         )}
 
         {/* Two Column Layout */}
-        <div style={{ display: "flex", gap: "32px", alignItems: "flex-start" }}>
+        <div style={{ display: "flex", gap: "32px", alignItems: "flex-start", flexWrap: "wrap" }}>
           {/* Left Column — Forms */}
           <div style={{ flex: 1 }}>
             {/* Passenger Forms */}
@@ -323,7 +323,7 @@ function BookingContent() {
           </div>
 
           {/* Right Column — Booking Summary */}
-          <div style={{ width: "300px", flexShrink: 0 }}>
+          <div style={{ width: "300px", minWidth: "280px", flex: "1 1 300px" }}>
             <div
               style={{
                 background: "#ffffff",
