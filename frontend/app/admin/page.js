@@ -218,30 +218,31 @@ export default function AdminPage() {
 
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
-      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 48px 64px" }}>
+      <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 16px 64px" }}>
         {/* Header */}
         <div style={{ marginBottom: "24px" }}>
           <p style={{ fontSize: "13px", fontWeight: 700, letterSpacing: "0.05em", color: "#2f5af0", marginBottom: "4px" }}>ADMIN PANEL</p>
-          <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#15192e", marginBottom: "6px" }}>Operations Dashboard</h1>
+          <h1 style={{ fontSize: "24px", fontWeight: 800, color: "#15192e", marginBottom: "6px" }}>Operations Dashboard</h1>
           <p style={{ fontSize: "14px", color: "#6b7280" }}>Monitor bookings, payments, users, refunds, and audit activity from one place.</p>
           <p style={{ fontSize: "12px", color: "#9ca3af", marginTop: "8px" }}>Signed in as ADMIN</p>
         </div>
 
         {/* Tabs */}
-        <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "32px", flexWrap: "wrap" }}>
           {tabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               style={{
-                padding: "8px 16px",
-                fontSize: "14px",
+                padding: "8px 14px",
+                fontSize: "13px",
                 fontWeight: 600,
                 borderRadius: "8px",
                 border: activeTab === tab ? "none" : "1px solid #e3e6ef",
                 background: activeTab === tab ? "transparent" : "#ffffff",
                 color: activeTab === tab ? "#2f5af0" : "#15192e",
                 cursor: "pointer",
+                whiteSpace: "nowrap",
               }}
             >
               {tab}
@@ -270,12 +271,12 @@ export default function AdminPage() {
             </div>
 
             {/* Recent Bookings */}
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", border: "1px solid #f1f5f9", marginBottom: "24px" }}>
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto", marginBottom: "24px" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#15192e" }}>Recent Bookings</h3>
                 <button onClick={() => setActiveTab("Bookings")} style={{ fontSize: "13px", color: "#2f5af0", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}>Open booking manager</button>
               </div>
-              <table style={{ width: "100%", fontSize: "14px", borderCollapse: "collapse" }}>
+              <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
                     <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>PNR</th>
@@ -300,12 +301,12 @@ export default function AdminPage() {
             </div>
 
             {/* Recent Payments */}
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", border: "1px solid #f1f5f9" }}>
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
                 <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#15192e" }}>Recent Payments</h3>
                 <button onClick={() => setActiveTab("Payments")} style={{ fontSize: "13px", color: "#2f5af0", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}>Open payments manager</button>
               </div>
-              <table style={{ width: "100%", fontSize: "14px", borderCollapse: "collapse" }}>
+              <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
                     <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>BOOKING</th>
@@ -337,7 +338,7 @@ export default function AdminPage() {
             <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#15192e", marginBottom: "6px" }}>Booking Manager</h2>
             <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "24px" }}>Approve, cancel, and review every booking with reason history.</p>
 
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", border: "1px solid #f1f5f9" }}>
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
               {/* Filters */}
               <div style={{ marginBottom: "24px" }}>
                 <select value={bookingStatusFilter} onChange={(e) => setBookingStatusFilter(e.target.value)} style={{ width: "100%", border: "1px solid #e3e6ef", borderRadius: "10px", padding: "12px 16px", fontSize: "14px", marginBottom: "12px", color: "#4b5165" }}>
@@ -354,7 +355,7 @@ export default function AdminPage() {
                 </select>
               </div>
 
-              <table style={{ width: "100%", fontSize: "14px", borderCollapse: "collapse" }}>
+              <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
                     <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>PNR</th>
@@ -412,11 +413,11 @@ export default function AdminPage() {
 
             {/* Flight Form */}
             {showFlightForm && (
-              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", border: "1px solid #e3e6ef", marginBottom: "24px" }}>
+              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #e3e6ef", overflowX: "auto", marginBottom: "24px" }}>
                 <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#15192e", marginBottom: "16px" }}>
                   {editingFlight ? "Edit Flight" : "Add New Flight"}
                 </h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "16px" }}>
                   <div>
                     <label style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em", color: "#8a90a8", display: "block", marginBottom: "6px" }}>AIRLINE CODE</label>
                     <input placeholder="e.g. PR" value={flightForm.airlineCode} onChange={(e) => setFlightForm({ ...flightForm, airlineCode: e.target.value })} style={{ width: "100%", border: "1px solid #e3e6ef", borderRadius: "10px", padding: "10px 14px", fontSize: "14px" }} />
@@ -470,8 +471,8 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", border: "1px solid #f1f5f9" }}>
-              <table style={{ width: "100%", fontSize: "14px", borderCollapse: "collapse" }}>
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
+              <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
                     <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>FLIGHT</th>
@@ -516,9 +517,9 @@ export default function AdminPage() {
 
             {/* User Edit Form */}
             {showUserForm && (
-              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", border: "1px solid #e3e6ef", marginBottom: "24px" }}>
+              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #e3e6ef", overflowX: "auto", marginBottom: "24px" }}>
                 <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#15192e", marginBottom: "16px" }}>Edit User</h3>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px", marginBottom: "16px" }}>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px", marginBottom: "16px" }}>
                   <div>
                     <label style={{ fontSize: "11px", fontWeight: 700, letterSpacing: "0.05em", color: "#8a90a8", display: "block", marginBottom: "6px" }}>FIRST NAME</label>
                     <input value={userForm.firstName} onChange={(e) => setUserForm({ ...userForm, firstName: e.target.value })} style={{ width: "100%", border: "1px solid #e3e6ef", borderRadius: "10px", padding: "10px 14px", fontSize: "14px" }} />
@@ -558,8 +559,8 @@ export default function AdminPage() {
               </div>
             )}
 
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", border: "1px solid #f1f5f9" }}>
-              <table style={{ width: "100%", fontSize: "14px", borderCollapse: "collapse" }}>
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
+              <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
                     <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>NAME</th>
@@ -600,8 +601,8 @@ export default function AdminPage() {
           <div>
             <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#15192e", marginBottom: "6px" }}>Payment Manager</h2>
             <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "24px" }}>View all payment records.</p>
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "28px", border: "1px solid #f1f5f9" }}>
-              <table style={{ width: "100%", fontSize: "14px", borderCollapse: "collapse" }}>
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
+              <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
                     <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>BOOKING</th>
