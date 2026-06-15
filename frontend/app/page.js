@@ -125,8 +125,8 @@ export default function Home() {
         className="text-white relative overflow-hidden"
         style={{
           background: "linear-gradient(135deg, #0c1330 0%, #1c2f6e 55%, #2a4090 100%)",
-          padding: "80px 64px",
-          minHeight: "660px",
+          padding: "40px 20px",
+          minHeight: "auto",
         }}
       >
         {/* Glow effect */}
@@ -227,7 +227,7 @@ export default function Home() {
             </div>
 
             {/* Stats */}
-            <div className="flex" style={{ gap: "56px" }}>
+            <div className="flex" style={{ gap: "32px" }}>
               <div>
                 <p style={{ fontSize: "32px", fontWeight: 800, color: "#ffffff", marginBottom: "4px" }}>
                   {flights.length || 8}
@@ -261,7 +261,7 @@ export default function Home() {
               background: "#ffffff",
               borderRadius: "16px",
               padding: "32px",
-              width: "460px",
+              width: "100%", maxWidth: "460px",
               flexShrink: 0,
               boxShadow: "0 30px 60px rgba(0, 0, 0, 0.25)",
             }}
@@ -500,7 +500,7 @@ export default function Home() {
       <section
         style={{
           background: "#f1f5f9",
-          padding: "80px 64px",
+          padding: "40px 20px",
         }}
       >
         <div style={{ maxWidth: "1280px", margin: "0 auto" }}>
@@ -634,7 +634,7 @@ export default function Home() {
       </section>
 
       {/* ══════════════════ WHY AIRBOOK PH ══════════════════ */}
-      <section style={{ background: "#ffffff", padding: "100px 64px" }}>
+      <section style={{ background: "#ffffff", padding: "60px 20px" }}>
         <div style={{ maxWidth: "1280px", margin: "0 auto", textAlign: "center" }}>
           <p
             style={{
@@ -661,7 +661,7 @@ export default function Home() {
           <div
             style={{
               display: "grid",
-              gridTemplateColumns: "repeat(3, 1fr)",
+              gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))",
               gap: "24px",
             }}
           >
@@ -723,7 +723,7 @@ export default function Home() {
       </section>
 
       {/* ══════════════════ CTA SECTION ══════════════════ */}
-      <section style={{ background: "#ffffff", padding: "0 64px 100px 64px" }}>
+      <section style={{ background: "#ffffff", padding: "0 20px 60px 20px" }}>
         <div
           className="flex flex-col md:flex-row items-center justify-between"
           style={{
@@ -731,7 +731,7 @@ export default function Home() {
             margin: "0 auto",
             background: "linear-gradient(135deg, #0c1330 0%, #1c2f6e 100%)",
             borderRadius: "24px",
-            padding: "64px",
+            padding: "32px 20px",
             gap: "40px",
           }}
         >
