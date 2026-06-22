@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { getFlightById } from "@/services/flightService";
+import BookingProgress from "@/components/BookingProgress";
 
 export default function SeatSelectionPage() {
   const params = useParams();
@@ -92,6 +93,9 @@ export default function SeatSelectionPage() {
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "24px 20px 64px" }}>
+        {/* Booking Progress */}
+        <BookingProgress currentStep={2} />
+
         {/* Back button */}
         <Link
           href={`/flights/search?from=${flight.origin}&to=${flight.destination}`}

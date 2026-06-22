@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import API from "@/services/api";
+import BookingProgress from "@/components/BookingProgress";
 
 function PaymentContent() {
   const searchParams = useSearchParams();
@@ -88,6 +89,9 @@ function PaymentContent() {
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 20px 64px" }}>
+        {/* Booking Progress */}
+        <BookingProgress currentStep={4} />
+
         {/* Timer */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "32px" }}>
           <span style={{ fontSize: "14px", color: "#6b7280" }}>⏱ Seat hold expires in</span>

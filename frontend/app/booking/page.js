@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { getFlightById } from "@/services/flightService";
 import { createBooking } from "@/services/bookingService";
+import BookingProgress from "@/components/BookingProgress";
 
 function BookingContent() {
   const searchParams = useSearchParams();
@@ -143,6 +144,9 @@ function BookingContent() {
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
       <div style={{ maxWidth: "1200px", margin: "0 auto", padding: "32px 20px 64px" }}>
+        {/* Booking Progress */}
+        <BookingProgress currentStep={3} />
+
         {/* Timer */}
         <div style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "24px" }}>
           <span style={{ fontSize: "14px", color: "#6b7280" }}>⏱ Seat hold expires in</span>

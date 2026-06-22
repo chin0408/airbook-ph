@@ -29,6 +29,126 @@ export default function BookingReceiptPage({ params }) {
 
   const handlePrint = () => window.print();
 
+  const handleDownloadETicket = () => {
+    const ticketWindow = window.open("", "_blank");
+    const flight = booking.flight;
+    const formatD = (dateStr) => new Date(dateStr).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+    const formatT = (dateStr) => new Date(dateStr).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
+
+    const passengerRows = booking.passengers?.map((pax, i) => `
+      <tr>
+        <td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;">${pax.firstName} ${pax.lastName}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;text-transform:uppercase;">${pax.passengerType || "Adult"}</td>
+        <td style="padding:8px 12px;border-bottom:1px solid #f1f5f9;font-weight:700;">${booking.selectedSeats?.[i] || "-"}</td>
+      </tr>
+    `).join("");
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>E-Ticket - ${booking.bookingReference}</title>
+        <style>
+          body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 40px; background: #f8fafc; color: #15192e; }
+          .ticket { max-width: 700px; margin: 0 auto; background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+          .ticket-header { background: linear-gradient(135deg, #0c1330 0%, #2f5af0 100%); color: #fff; padding: 32px 40px; }
+          .ticket-header h1 { margin: 0 0 4px; font-size: 24px; font-weight: 800; }
+          .ticket-header p { margin: 0; font-size: 14px; opacity: 0.8; }
+          .ticket-body { padding: 32px 40px; }
+          .info-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 28px; }
+          .info-label { font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #8a90a8; margin-bottom: 4px; }
+          .info-value { font-size: 15px; font-weight: 600; }
+          .route-section { text-align: center; padding: 24px 0; border-top: 1px dashed #e3e6ef; border-bottom: 1px dashed #e3e6ef; margin-bottom: 28px; }
+          .route-section .route { font-size: 36px; font-weight: 800; color: #15192e; letter-spacing: 2px; }
+          .route-section .arrow { color: #2f5af0; margin: 0 12px; }
+          .route-section .times { font-size: 14px; color: #6b7280; margin-top: 8px; }
+          table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 24px; }
+          th { text-align: left; padding: 8px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.05em; color: #8a90a8; border-bottom: 2px solid #f1f5f9; }
+          .total-section { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-top: 2px solid #f1f5f9; }
+          .total-label { font-size: 16px; font-weight: 700; }
+          .total-amount { font-size: 28px; font-weight: 800; color: #2f5af0; }
+          .footer { text-align: center; padding: 20px 40px; background: #f8fafc; font-size: 12px; color: #9ca3af; }
+          .badge { display: inline-block; padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+          .badge-confirmed { background: #d1fae5; color: #065f46; }
+          .badge-issued { background: #d1fae5; color: #065f46; }
+          @media print { body { padding: 0; background: #fff; } .ticket { box-shadow: none; } .no-print { display: none; } }
+        </style>
+      </head>
+      <body>
+        <div class="ticket">
+          <div class="ticket-header">
+            <h1>✈ AirBook PH — E-Ticket</h1>
+            <p>Electronic Ticket / Itinerary Receipt</p>
+          </div>
+          <div class="ticket-body">
+            <div class="info-grid">
+              <div>
+                <div class="info-label">BOOKING REFERENCE (PNR)</div>
+                <div class="info-value" style="font-family:monospace;font-size:18px;">${booking.bookingReference}</div>
+              </div>
+              <div>
+                <div class="info-label">STATUS</div>
+                <div class="info-value"><span class="badge badge-confirmed">${booking.bookingStatus}</span></div>
+              </div>
+              <div>
+                <div class="info-label">TICKET STATUS</div>
+                <div class="info-value"><span class="badge badge-issued">${booking.ticketStatus}</span></div>
+              </div>
+            </div>
+
+            <div class="info-grid">
+              <div>
+                <div class="info-label">FLIGHT</div>
+                <div class="info-value">${flight?.flightNumber || "-"}</div>
+              </div>
+              <div>
+                <div class="info-label">DATE</div>
+                <div class="info-value">${formatD(flight?.departureTime)}</div>
+              </div>
+              <div>
+                <div class="info-label">PASSENGER(S)</div>
+                <div class="info-value">${booking.passengers?.length || 1}</div>
+              </div>
+            </div>
+
+            <div class="route-section">
+              <div class="route">
+                ${flight?.origin}<span class="arrow"> → </span>${flight?.destination}
+              </div>
+              <div class="times">
+                Departs ${formatT(flight?.departureTime)} — Arrives ${formatT(flight?.arrivalTime)}
+              </div>
+            </div>
+
+            <h3 style="font-size:16px;font-weight:700;margin-bottom:12px;">Passengers</h3>
+            <table>
+              <thead><tr><th>NAME</th><th>TYPE</th><th>SEAT</th></tr></thead>
+              <tbody>${passengerRows}</tbody>
+            </table>
+
+            <div class="total-section">
+              <span class="total-label">Total Paid</span>
+              <span class="total-amount">PHP ${booking.totalAmount?.toLocaleString()}.00</span>
+            </div>
+          </div>
+          <div class="footer">
+            <p>This is your electronic ticket. Please present this at check-in along with a valid ID.</p>
+            <p style="margin-top:8px;">Generated on ${new Date().toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit" })}</p>
+          </div>
+        </div>
+        <div class="no-print" style="text-align:center;margin-top:24px;">
+          <button onclick="window.print()" style="background:#2f5af0;color:#fff;font-size:15px;font-weight:700;padding:14px 28px;border:none;border-radius:10px;cursor:pointer;">
+            Print / Save as PDF
+          </button>
+        </div>
+      </body>
+      </html>
+    `;
+
+    ticketWindow.document.write(html);
+    ticketWindow.document.close();
+  };
+
   if (loading) {
     return (
       <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -83,21 +203,38 @@ export default function BookingReceiptPage({ params }) {
               Use for customer proof, booking confirmation, and payment traceability.
             </p>
           </div>
-          <button
-            onClick={handlePrint}
-            style={{
-              background: "#15192e",
-              color: "#ffffff",
-              fontSize: "14px",
-              fontWeight: 600,
-              padding: "12px 20px",
-              border: "none",
-              borderRadius: "10px",
-              cursor: "pointer",
-            }}
-          >
-            Print Receipt
-          </button>
+          <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+            <button
+              onClick={handleDownloadETicket}
+              style={{
+                background: "#2f5af0",
+                color: "#ffffff",
+                fontSize: "14px",
+                fontWeight: 600,
+                padding: "12px 20px",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+              }}
+            >
+              Download E-Ticket
+            </button>
+            <button
+              onClick={handlePrint}
+              style={{
+                background: "#15192e",
+                color: "#ffffff",
+                fontSize: "14px",
+                fontWeight: 600,
+                padding: "12px 20px",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+              }}
+            >
+              Print Receipt
+            </button>
+          </div>
         </div>
 
         {/* Receipt Card */}

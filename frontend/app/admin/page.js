@@ -3,6 +3,10 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import API from "@/services/api";
+import {
+  BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
+  XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend,
+} from "recharts";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -14,6 +18,19 @@ export default function AdminPage() {
   const [user, setUser] = useState(null);
   const [bookingStatusFilter, setBookingStatusFilter] = useState("");
   const [paymentStatusFilter, setPaymentStatusFilter] = useState("");
+
+  // Search states
+  const [bookingSearch, setBookingSearch] = useState("");
+  const [flightSearch, setFlightSearch] = useState("");
+  const [userSearch, setUserSearch] = useState("");
+  const [paymentSearch, setPaymentSearch] = useState("");
+
+  // Pagination states
+  const [bookingPage, setBookingPage] = useState(1);
+  const [flightPage, setFlightPage] = useState(1);
+  const [userPage, setUserPage] = useState(1);
+  const [paymentPage, setPaymentPage] = useState(1);
+  const PAGE_SIZE = 8;
 
   // Flight CRUD state
   const [showFlightForm, setShowFlightForm] = useState(false);
@@ -27,6 +44,19 @@ export default function AdminPage() {
     setFlightForm({ airlineCode: "", flightNumber: "", origin: "", destination: "", departureTime: "", arrivalTime: "", baseFare: "", seatCapacity: "", flightStatus: "SCHEDULED" });
     setEditingFlight(null);
     setShowFlightForm(false);
+  };
+
+  // User CRUD state
+  const [showUserForm, setShowUserForm] = useState(false);
+  const [editingUser, setEditingUser] = useState(null);
+  const [userForm, setUserForm] = useState({
+    firstName: "", lastName: "", email: "", mobileNumber: "", isAdmin: false, newPassword: "",
+  });
+
+  const resetUserForm = () => {
+    setUserForm({ firstName: "", lastName: "", email: "", mobileNumber: "", isAdmin: false, newPassword: "" });
+    setEditingUser(null);
+    setShowUserForm(false);
   };
 
   const tabs = ["Dashboard", "Bookings", "Flights", "Users", "Payments", "Audit Logs"];
@@ -125,18 +155,6 @@ export default function AdminPage() {
   };
 
   // User CRUD handlers
-  const [showUserForm, setShowUserForm] = useState(false);
-  const [editingUser, setEditingUser] = useState(null);
-  const [userForm, setUserForm] = useState({
-    firstName: "", lastName: "", email: "", mobileNumber: "", isAdmin: false, newPassword: "",
-  });
-
-  const resetUserForm = () => {
-    setUserForm({ firstName: "", lastName: "", email: "", mobileNumber: "", isAdmin: false, newPassword: "" });
-    setEditingUser(null);
-    setShowUserForm(false);
-  };
-
   const handleEditUser = (u) => {
     setEditingUser(u._id);
     setUserForm({
@@ -179,6 +197,7 @@ export default function AdminPage() {
     } catch (error) { alert("Failed to delete user"); }
   };
 
+  // Helper functions
   const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   const formatTime = (dateStr) => new Date(dateStr).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true });
 
@@ -186,12 +205,98 @@ export default function AdminPage() {
   const confirmedCount = bookings.filter((b) => b.bookingStatus === "CONFIRMED").length;
   const pendingPayment = bookings.filter((b) => b.bookingStatus === "PENDING_PAYMENT").length;
   const paidCount = bookings.filter((b) => b.paymentStatus === "PAID").length;
+  const cancelledCount = bookings.filter((b) => b.bookingStatus === "CANCELLED").length;
 
+  // Analytics data preparation
+  const getBookingTrendData = () => {
+    const monthMap = {};
+    bookings.forEach((b) => {
+      const date = new Date(b.createdAt);
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      const label = date.toLocaleDateString("en-US", { month: "short", year: "numeric" });
+      if (!monthMap[key]) monthMap[key] = { month: label, bookings: 0, revenue: 0 };
+      monthMap[key].bookings += 1;
+      if (b.paymentStatus === "PAID") monthMap[key].revenue += b.totalAmount || 0;
+    });
+    return Object.values(monthMap).slice(-6);
+  };
+
+  const getBookingStatusData = () => {
+    return [
+      { name: "Confirmed", value: confirmedCount, color: "#10b981" },
+      { name: "Pending", value: pendingPayment, color: "#f59e0b" },
+      { name: "Cancelled", value: cancelledCount, color: "#ef4444" },
+    ].filter((d) => d.value > 0);
+  };
+
+  const getRevenueByRouteData = () => {
+    const routeMap = {};
+    bookings.filter((b) => b.paymentStatus === "PAID").forEach((b) => {
+      const route = b.flight ? `${b.flight.origin}-${b.flight.destination}` : "Unknown";
+      if (!routeMap[route]) routeMap[route] = { route, revenue: 0, count: 0 };
+      routeMap[route].revenue += b.totalAmount || 0;
+      routeMap[route].count += 1;
+    });
+    return Object.values(routeMap).sort((a, b) => b.revenue - a.revenue).slice(0, 5);
+  };
+
+  const getUserGrowthData = () => {
+    const monthMap = {};
+    users.forEach((u) => {
+      const date = new Date(u.createdAt);
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}`;
+      const label = date.toLocaleDateString("en-US", { month: "short" });
+      if (!monthMap[key]) monthMap[key] = { month: label, users: 0 };
+      monthMap[key].users += 1;
+    });
+    return Object.values(monthMap).slice(-6);
+  };
+
+  // Filtered + paginated data
   const filteredBookings = bookings.filter((b) => {
     if (bookingStatusFilter && b.bookingStatus !== bookingStatusFilter) return false;
     if (paymentStatusFilter && b.paymentStatus !== paymentStatusFilter) return false;
+    if (bookingSearch) {
+      const s = bookingSearch.toLowerCase();
+      const matchRef = b.bookingReference?.toLowerCase().includes(s);
+      const matchPax = b.passengers?.[0]?.firstName?.toLowerCase().includes(s) || b.passengers?.[0]?.lastName?.toLowerCase().includes(s);
+      const matchFlight = b.flight?.flightNumber?.toLowerCase().includes(s);
+      if (!matchRef && !matchPax && !matchFlight) return false;
+    }
     return true;
   });
+
+  const filteredFlights = flights.filter((f) => {
+    if (flightSearch) {
+      const s = flightSearch.toLowerCase();
+      return f.flightNumber?.toLowerCase().includes(s) || f.origin?.toLowerCase().includes(s) || f.destination?.toLowerCase().includes(s);
+    }
+    return true;
+  });
+
+  const filteredUsers = users.filter((u) => {
+    if (userSearch) {
+      const s = userSearch.toLowerCase();
+      return u.firstName?.toLowerCase().includes(s) || u.lastName?.toLowerCase().includes(s) || u.email?.toLowerCase().includes(s);
+    }
+    return true;
+  });
+
+  const filteredPayments = bookings.filter((b) => {
+    if (paymentSearch) {
+      const s = paymentSearch.toLowerCase();
+      return b.bookingReference?.toLowerCase().includes(s) || b.paymentStatus?.toLowerCase().includes(s);
+    }
+    return true;
+  });
+
+  // Pagination helper
+  const paginate = (data, page) => {
+    const start = (page - 1) * PAGE_SIZE;
+    return data.slice(start, start + PAGE_SIZE);
+  };
+
+  const totalPages = (data) => Math.ceil(data.length / PAGE_SIZE);
 
   const getBadgeStyle = (status) => {
     const map = {
@@ -207,6 +312,35 @@ export default function AdminPage() {
     };
     return map[status] || { background: "#f1f5f9", color: "#4b5165" };
   };
+
+  // Pagination component
+  const PaginationControls = ({ currentPage, total, onPageChange }) => {
+    if (total <= 1) return null;
+    return (
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", marginTop: "20px" }}>
+        <button onClick={() => onPageChange(currentPage - 1)} disabled={currentPage <= 1}
+          style={{ padding: "6px 12px", fontSize: "13px", fontWeight: 600, borderRadius: "8px", border: "1px solid #e3e6ef", background: currentPage <= 1 ? "#f8fafc" : "#fff", color: currentPage <= 1 ? "#9ca3af" : "#15192e", cursor: currentPage <= 1 ? "not-allowed" : "pointer" }}>
+          Previous
+        </button>
+        <span style={{ fontSize: "13px", color: "#6b7280" }}>Page {currentPage} of {total}</span>
+        <button onClick={() => onPageChange(currentPage + 1)} disabled={currentPage >= total}
+          style={{ padding: "6px 12px", fontSize: "13px", fontWeight: 600, borderRadius: "8px", border: "1px solid #e3e6ef", background: currentPage >= total ? "#f8fafc" : "#fff", color: currentPage >= total ? "#9ca3af" : "#15192e", cursor: currentPage >= total ? "not-allowed" : "pointer" }}>
+          Next
+        </button>
+      </div>
+    );
+  };
+
+  // Search input component
+  const SearchInput = ({ value, onChange, placeholder }) => (
+    <input
+      type="text"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      placeholder={placeholder}
+      style={{ width: "100%", maxWidth: "320px", border: "1px solid #e3e6ef", borderRadius: "10px", padding: "10px 16px", fontSize: "14px", marginBottom: "16px", outline: "none" }}
+    />
+  );
 
   if (loading) {
     return (
@@ -263,11 +397,88 @@ export default function AdminPage() {
                 { label: "Paid payments", value: paidCount },
                 { label: "Total users", value: users.length },
               ].map((stat, i) => (
-                <div key={i} style={{ background: "#f8fafc", border: "1px solid #f1f5f9", borderRadius: "12px", padding: "20px" }}>
+                <div key={i} style={{ background: "#ffffff", border: "1px solid #f1f5f9", borderRadius: "12px", padding: "20px" }}>
                   <p style={{ fontSize: "12px", color: "#8a90a8", marginBottom: "6px" }}>{stat.label}</p>
                   <p style={{ fontSize: "22px", fontWeight: 800, color: "#15192e" }}>{stat.value}</p>
                 </div>
               ))}
+            </div>
+
+            {/* Charts Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "24px", marginBottom: "32px" }}>
+              {/* Booking Trends Chart */}
+              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", border: "1px solid #f1f5f9" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#15192e", marginBottom: "20px" }}>Booking Trends</h3>
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={getBookingTrendData()}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="month" fontSize={11} tick={{ fill: "#8a90a8" }} />
+                    <YAxis fontSize={11} tick={{ fill: "#8a90a8" }} />
+                    <Tooltip />
+                    <Bar dataKey="bookings" fill="#2f5af0" radius={[4, 4, 0, 0]} name="Bookings" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Revenue Trend Chart */}
+              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", border: "1px solid #f1f5f9" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#15192e", marginBottom: "20px" }}>Revenue Trend</h3>
+                <ResponsiveContainer width="100%" height={220}>
+                  <LineChart data={getBookingTrendData()}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis dataKey="month" fontSize={11} tick={{ fill: "#8a90a8" }} />
+                    <YAxis fontSize={11} tick={{ fill: "#8a90a8" }} tickFormatter={(v) => `₱${(v / 1000).toFixed(0)}k`} />
+                    <Tooltip formatter={(value) => [`PHP ${value.toLocaleString()}`, "Revenue"]} />
+                    <Line type="monotone" dataKey="revenue" stroke="#10b981" strokeWidth={2} dot={{ fill: "#10b981" }} name="Revenue" />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* Second Charts Row */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(340px, 1fr))", gap: "24px", marginBottom: "32px" }}>
+              {/* Booking Status Pie */}
+              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", border: "1px solid #f1f5f9" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#15192e", marginBottom: "20px" }}>Booking Status Distribution</h3>
+                <ResponsiveContainer width="100%" height={220}>
+                  <PieChart>
+                    <Pie data={getBookingStatusData()} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={5} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                      {getBookingStatusData().map((entry, i) => (
+                        <Cell key={i} fill={entry.color} />
+                      ))}
+                    </Pie>
+                    <Tooltip />
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+
+              {/* Revenue by Route */}
+              <div style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", border: "1px solid #f1f5f9" }}>
+                <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#15192e", marginBottom: "20px" }}>Top Routes by Revenue</h3>
+                <ResponsiveContainer width="100%" height={220}>
+                  <BarChart data={getRevenueByRouteData()} layout="vertical">
+                    <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                    <XAxis type="number" fontSize={11} tick={{ fill: "#8a90a8" }} tickFormatter={(v) => `₱${(v / 1000).toFixed(0)}k`} />
+                    <YAxis type="category" dataKey="route" fontSize={11} tick={{ fill: "#8a90a8" }} width={80} />
+                    <Tooltip formatter={(value) => [`PHP ${value.toLocaleString()}`, "Revenue"]} />
+                    <Bar dataKey="revenue" fill="#6366f1" radius={[0, 4, 4, 0]} name="Revenue" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
+            {/* User Growth Chart */}
+            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "24px", border: "1px solid #f1f5f9", marginBottom: "32px" }}>
+              <h3 style={{ fontSize: "16px", fontWeight: 700, color: "#15192e", marginBottom: "20px" }}>User Registrations</h3>
+              <ResponsiveContainer width="100%" height={200}>
+                <BarChart data={getUserGrowthData()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+                  <XAxis dataKey="month" fontSize={11} tick={{ fill: "#8a90a8" }} />
+                  <YAxis fontSize={11} tick={{ fill: "#8a90a8" }} />
+                  <Tooltip />
+                  <Bar dataKey="users" fill="#8b5cf6" radius={[4, 4, 0, 0]} name="New Users" />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
 
             {/* Recent Bookings */}
@@ -292,38 +503,10 @@ export default function AdminPage() {
                       <td style={{ padding: "12px 0", fontWeight: 600, fontFamily: "monospace" }}>{b.bookingReference}</td>
                       <td style={{ padding: "12px 0" }}>{b.flight?.flightNumber}</td>
                       <td style={{ padding: "12px 0" }}>{b.flight?.origin} → {b.flight?.destination}</td>
-                      <td style={{ padding: "12px 0" }}>{b.bookingStatus} / {b.paymentStatus}</td>
+                      <td style={{ padding: "12px 0" }}>
+                        <span style={{ ...getBadgeStyle(b.bookingStatus), padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 700 }}>{b.bookingStatus}</span>
+                      </td>
                       <td style={{ padding: "12px 0", textAlign: "right" }}>PHP {b.totalAmount?.toLocaleString()}.00</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Recent Payments */}
-            <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-                <h3 style={{ fontSize: "18px", fontWeight: 700, color: "#15192e" }}>Recent Payments</h3>
-                <button onClick={() => setActiveTab("Payments")} style={{ fontSize: "13px", color: "#2f5af0", fontWeight: 600, background: "none", border: "none", cursor: "pointer" }}>Open payments manager</button>
-              </div>
-              <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
-                <thead>
-                  <tr style={{ textAlign: "left" }}>
-                    <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>BOOKING</th>
-                    <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>PROVIDER</th>
-                    <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>STATUS</th>
-                    <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>AMOUNT</th>
-                    <th style={{ fontSize: "11px", fontWeight: 700, color: "#8a90a8", letterSpacing: "0.05em", paddingBottom: "12px" }}>CREATED</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookings.slice(0, 5).map((b) => (
-                    <tr key={b._id} style={{ borderTop: "1px solid #f8fafc" }}>
-                      <td style={{ padding: "12px 0", fontWeight: 600, fontFamily: "monospace" }}>{b.bookingReference}</td>
-                      <td style={{ padding: "12px 0" }}>stripe</td>
-                      <td style={{ padding: "12px 0" }}>{b.paymentStatus}</td>
-                      <td style={{ padding: "12px 0" }}>PHP {b.totalAmount?.toLocaleString()}.00</td>
-                      <td style={{ padding: "12px 0" }}>{formatDate(b.createdAt)}, {formatTime(b.createdAt)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -339,20 +522,23 @@ export default function AdminPage() {
             <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "24px" }}>Approve, cancel, and review every booking with reason history.</p>
 
             <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
-              {/* Filters */}
+              {/* Search + Filters */}
               <div style={{ marginBottom: "24px" }}>
-                <select value={bookingStatusFilter} onChange={(e) => setBookingStatusFilter(e.target.value)} style={{ width: "100%", border: "1px solid #e3e6ef", borderRadius: "10px", padding: "12px 16px", fontSize: "14px", marginBottom: "12px", color: "#4b5165" }}>
-                  <option value="">All booking statuses</option>
-                  <option value="PENDING_PAYMENT">Pending Payment</option>
-                  <option value="CONFIRMED">Confirmed</option>
-                  <option value="CANCELLED">Cancelled</option>
-                </select>
-                <select value={paymentStatusFilter} onChange={(e) => setPaymentStatusFilter(e.target.value)} style={{ width: "100%", border: "1px solid #e3e6ef", borderRadius: "10px", padding: "12px 16px", fontSize: "14px", color: "#4b5165" }}>
-                  <option value="">All payment statuses</option>
-                  <option value="PENDING">Pending</option>
-                  <option value="PAID">Paid</option>
-                  <option value="REFUNDED">Refunded</option>
-                </select>
+                <SearchInput value={bookingSearch} onChange={(v) => { setBookingSearch(v); setBookingPage(1); }} placeholder="Search by PNR, passenger, or flight..." />
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap" }}>
+                  <select value={bookingStatusFilter} onChange={(e) => { setBookingStatusFilter(e.target.value); setBookingPage(1); }} style={{ border: "1px solid #e3e6ef", borderRadius: "10px", padding: "10px 16px", fontSize: "14px", color: "#4b5165" }}>
+                    <option value="">All booking statuses</option>
+                    <option value="PENDING_PAYMENT">Pending Payment</option>
+                    <option value="CONFIRMED">Confirmed</option>
+                    <option value="CANCELLED">Cancelled</option>
+                  </select>
+                  <select value={paymentStatusFilter} onChange={(e) => { setPaymentStatusFilter(e.target.value); setBookingPage(1); }} style={{ border: "1px solid #e3e6ef", borderRadius: "10px", padding: "10px 16px", fontSize: "14px", color: "#4b5165" }}>
+                    <option value="">All payment statuses</option>
+                    <option value="PENDING">Pending</option>
+                    <option value="PAID">Paid</option>
+                    <option value="REFUNDED">Refunded</option>
+                  </select>
+                </div>
               </div>
 
               <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
@@ -367,7 +553,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredBookings.map((b) => (
+                  {paginate(filteredBookings, bookingPage).map((b) => (
                     <tr key={b._id} style={{ borderTop: "1px solid #f8fafc" }}>
                       <td style={{ padding: "14px 0" }}>
                         <p style={{ fontWeight: 700, fontFamily: "monospace" }}>{b.bookingReference}</p>
@@ -375,7 +561,9 @@ export default function AdminPage() {
                       </td>
                       <td style={{ padding: "14px 0" }}>{b.passengers?.[0]?.firstName} {b.passengers?.[0]?.lastName}</td>
                       <td style={{ padding: "14px 0" }}>{b.flight?.flightNumber} · {b.flight?.origin} → {b.flight?.destination}</td>
-                      <td style={{ padding: "14px 0", fontSize: "12px" }}>{b.bookingStatus} / {b.paymentStatus}</td>
+                      <td style={{ padding: "14px 0" }}>
+                        <span style={{ ...getBadgeStyle(b.bookingStatus), padding: "4px 10px", borderRadius: "6px", fontSize: "11px", fontWeight: 700 }}>{b.bookingStatus}</span>
+                      </td>
                       <td style={{ padding: "14px 0" }}>PHP {b.totalAmount?.toLocaleString()}.00</td>
                       <td style={{ padding: "14px 0" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
@@ -391,6 +579,7 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
+              <PaginationControls currentPage={bookingPage} total={totalPages(filteredBookings)} onPageChange={setBookingPage} />
             </div>
           </div>
         )}
@@ -403,10 +592,8 @@ export default function AdminPage() {
                 <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#15192e", marginBottom: "6px" }}>Flight Manager</h2>
                 <p style={{ fontSize: "14px", color: "#6b7280" }}>View and manage all flights.</p>
               </div>
-              <button
-                onClick={() => { resetFlightForm(); setShowFlightForm(true); }}
-                style={{ padding: "10px 20px", fontSize: "14px", fontWeight: 700, color: "#ffffff", background: "#2f5af0", border: "none", borderRadius: "10px", cursor: "pointer" }}
-              >
+              <button onClick={() => { resetFlightForm(); setShowFlightForm(true); }}
+                style={{ padding: "10px 20px", fontSize: "14px", fontWeight: 700, color: "#ffffff", background: "#2f5af0", border: "none", borderRadius: "10px", cursor: "pointer" }}>
                 + Add Flight
               </button>
             </div>
@@ -464,14 +651,13 @@ export default function AdminPage() {
                   <button onClick={handleFlightFormSubmit} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 700, color: "#ffffff", background: "#2f5af0", border: "none", borderRadius: "10px", cursor: "pointer" }}>
                     {editingFlight ? "Update Flight" : "Create Flight"}
                   </button>
-                  <button onClick={resetFlightForm} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 600, color: "#6b7280", background: "none", border: "1px solid #e3e6ef", borderRadius: "10px", cursor: "pointer" }}>
-                    Cancel
-                  </button>
+                  <button onClick={resetFlightForm} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 600, color: "#6b7280", background: "none", border: "1px solid #e3e6ef", borderRadius: "10px", cursor: "pointer" }}>Cancel</button>
                 </div>
               </div>
             )}
 
             <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
+              <SearchInput value={flightSearch} onChange={(v) => { setFlightSearch(v); setFlightPage(1); }} placeholder="Search by flight number, origin, or destination..." />
               <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
@@ -485,7 +671,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {flights.map((f) => (
+                  {paginate(filteredFlights, flightPage).map((f) => (
                     <tr key={f._id} style={{ borderTop: "1px solid #f8fafc" }}>
                       <td style={{ padding: "12px 0", fontWeight: 600 }}>{f.flightNumber}</td>
                       <td style={{ padding: "12px 0" }}>{f.origin} → {f.destination}</td>
@@ -505,6 +691,7 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
+              <PaginationControls currentPage={flightPage} total={totalPages(filteredFlights)} onPageChange={setFlightPage} />
             </div>
           </div>
         )}
@@ -549,17 +736,14 @@ export default function AdminPage() {
                   </div>
                 </div>
                 <div style={{ display: "flex", gap: "12px" }}>
-                  <button onClick={handleUpdateUser} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 700, color: "#ffffff", background: "#2f5af0", border: "none", borderRadius: "10px", cursor: "pointer" }}>
-                    Update User
-                  </button>
-                  <button onClick={resetUserForm} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 600, color: "#6b7280", background: "none", border: "1px solid #e3e6ef", borderRadius: "10px", cursor: "pointer" }}>
-                    Cancel
-                  </button>
+                  <button onClick={handleUpdateUser} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 700, color: "#ffffff", background: "#2f5af0", border: "none", borderRadius: "10px", cursor: "pointer" }}>Update User</button>
+                  <button onClick={resetUserForm} style={{ padding: "10px 24px", fontSize: "14px", fontWeight: 600, color: "#6b7280", background: "none", border: "1px solid #e3e6ef", borderRadius: "10px", cursor: "pointer" }}>Cancel</button>
                 </div>
               </div>
             )}
 
             <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
+              <SearchInput value={userSearch} onChange={(v) => { setUserSearch(v); setUserPage(1); }} placeholder="Search by name or email..." />
               <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
@@ -571,7 +755,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {users.map((u) => (
+                  {paginate(filteredUsers, userPage).map((u) => (
                     <tr key={u._id} style={{ borderTop: "1px solid #f8fafc" }}>
                       <td style={{ padding: "12px 0", fontWeight: 600 }}>{u.firstName} {u.lastName}</td>
                       <td style={{ padding: "12px 0" }}>{u.email}</td>
@@ -592,6 +776,7 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
+              <PaginationControls currentPage={userPage} total={totalPages(filteredUsers)} onPageChange={setUserPage} />
             </div>
           </div>
         )}
@@ -602,6 +787,7 @@ export default function AdminPage() {
             <h2 style={{ fontSize: "24px", fontWeight: 800, color: "#15192e", marginBottom: "6px" }}>Payment Manager</h2>
             <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "24px" }}>View all payment records.</p>
             <div style={{ background: "#ffffff", borderRadius: "16px", padding: "20px", border: "1px solid #f1f5f9", overflowX: "auto" }}>
+              <SearchInput value={paymentSearch} onChange={(v) => { setPaymentSearch(v); setPaymentPage(1); }} placeholder="Search by booking reference or status..." />
               <table style={{ width: "100%", fontSize: "13px", borderCollapse: "collapse", minWidth: "600px" }}>
                 <thead>
                   <tr style={{ textAlign: "left" }}>
@@ -613,7 +799,7 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {bookings.map((b) => (
+                  {paginate(filteredPayments, paymentPage).map((b) => (
                     <tr key={b._id} style={{ borderTop: "1px solid #f8fafc" }}>
                       <td style={{ padding: "12px 0", fontWeight: 600, fontFamily: "monospace" }}>{b.bookingReference}</td>
                       <td style={{ padding: "12px 0" }}>stripe</td>
@@ -626,6 +812,7 @@ export default function AdminPage() {
                   ))}
                 </tbody>
               </table>
+              <PaginationControls currentPage={paymentPage} total={totalPages(filteredPayments)} onPageChange={setPaymentPage} />
             </div>
           </div>
         )}

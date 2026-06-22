@@ -12,6 +12,7 @@ export default function Home() {
   const [to, setTo] = useState("CEB");
   const [departure, setDeparture] = useState("");
   const [passengers, setPassengers] = useState(1);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   // Fallback sample flights when API is not connected
   const sampleFlights = [
@@ -47,11 +48,12 @@ export default function Home() {
     const today = new Date().toISOString().split("T")[0];
     setDeparture(today);
 
-    // Redirect admin users to admin panel
+    // Check logged in user
     try {
       const storedUser = localStorage.getItem("user");
       if (storedUser && storedUser !== "undefined") {
         const user = JSON.parse(storedUser);
+        setLoggedInUser(user);
         if (user.isAdmin) {
           router.push("/admin");
         }
@@ -762,20 +764,37 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-shrink-0" style={{ gap: "16px" }}>
-            <Link
-              href="/register"
-              style={{
-                fontSize: "15px",
-                fontWeight: 600,
-                color: "#15192e",
-                background: "#ffffff",
-                padding: "14px 28px",
-                borderRadius: "8px",
-                textDecoration: "none",
-              }}
-            >
-              Create Account
-            </Link>
+            {!loggedInUser ? (
+              <Link
+                href="/register"
+                style={{
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  color: "#15192e",
+                  background: "#ffffff",
+                  padding: "14px 28px",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                }}
+              >
+                Create Account
+              </Link>
+            ) : (
+              <Link
+                href="/flights/search"
+                style={{
+                  fontSize: "15px",
+                  fontWeight: 600,
+                  color: "#15192e",
+                  background: "#ffffff",
+                  padding: "14px 28px",
+                  borderRadius: "8px",
+                  textDecoration: "none",
+                }}
+              >
+                Search Flights
+              </Link>
+            )}
             <Link
               href="/my-bookings"
               style={{

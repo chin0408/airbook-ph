@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import API from "@/services/api";
+import BookingProgress from "@/components/BookingProgress";
 
 function SuccessContent() {
   const searchParams = useSearchParams();
@@ -36,18 +37,23 @@ function SuccessContent() {
   };
 
   return (
-    <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <div
-        style={{
-          background: "#ffffff",
-          borderRadius: "20px",
-          padding: "56px 48px",
-          textAlign: "center",
-          maxWidth: "500px",
-          width: "100%",
-          boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
-        }}
-      >
+    <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
+      <div style={{ maxWidth: "600px", margin: "0 auto", padding: "40px 20px" }}>
+        {/* Booking Progress */}
+        <BookingProgress currentStep={5} />
+
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "20px",
+            padding: "56px 48px",
+            textAlign: "center",
+            maxWidth: "500px",
+            width: "100%",
+            margin: "0 auto",
+            boxShadow: "0 4px 20px rgba(0,0,0,0.06)",
+          }}
+        >
         {status === "verifying" && (
           <>
             <div style={{ fontSize: "48px", marginBottom: "20px" }}>⏳</div>
@@ -67,23 +73,37 @@ function SuccessContent() {
               Payment Successful!
             </h1>
             <p style={{ fontSize: "15px", color: "#6b7280", marginBottom: "32px", lineHeight: 1.6 }}>
-              Your booking has been confirmed and your ticket has been issued. You can view your receipt below.
+              Your booking has been confirmed and your ticket has been issued. You can view your e-ticket or download it below.
             </p>
-            <Link
-              href={`/my-bookings/${bookingId}`}
-              style={{
-                display: "inline-block",
-                background: "#2f5af0",
-                color: "#ffffff",
-                fontSize: "15px",
-                fontWeight: 700,
-                padding: "14px 28px",
-                borderRadius: "10px",
-                textDecoration: "none",
-              }}
-            >
-              View Receipt →
-            </Link>
+            <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
+              <Link
+                href={`/my-bookings/${bookingId}`}
+                style={{
+                  display: "inline-block",
+                  background: "#2f5af0",
+                  color: "#ffffff",
+                  fontSize: "15px",
+                  fontWeight: 700,
+                  padding: "14px 28px",
+                  borderRadius: "10px",
+                  textDecoration: "none",
+                }}
+              >
+                View & Download E-Ticket →
+              </Link>
+              <Link
+                href="/my-bookings"
+                style={{
+                  display: "inline-block",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  color: "#6b7280",
+                  textDecoration: "none",
+                }}
+              >
+                Go to My Bookings
+              </Link>
+            </div>
           </>
         )}
 
@@ -113,6 +133,7 @@ function SuccessContent() {
             </Link>
           </>
         )}
+      </div>
       </div>
     </main>
   );

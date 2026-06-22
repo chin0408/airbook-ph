@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { getFlights } from "@/services/flightService";
+import BookingProgress from "@/components/BookingProgress";
 
 function SearchContent() {
   const searchParams = useSearchParams();
@@ -160,6 +161,9 @@ function SearchContent() {
   return (
     <main style={{ background: "#f8fafc", minHeight: "calc(100vh - 72px)" }}>
       <div style={{ maxWidth: "1280px", margin: "0 auto", padding: "40px 24px" }}>
+        {/* Booking Progress */}
+        <BookingProgress currentStep={1} />
+
         {/* Header */}
         <div className="flex items-start justify-between" style={{ marginBottom: "32px" }}>
           <div>
