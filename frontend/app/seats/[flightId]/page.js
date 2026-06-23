@@ -308,7 +308,7 @@ export default function SeatSelectionPage() {
           </div>
 
           {/* Right Column: Selected Seats */}
-          <div style={{ width: "300px", minWidth: "280px", flex: "1 1 300px" }}>
+          <div style={{ width: "300px", minWidth: "280px", flexShrink: 0 }}>
             {/* Selected Seats Card */}
             <div
               style={{

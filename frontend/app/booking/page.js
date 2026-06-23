@@ -327,7 +327,7 @@ function BookingContent() {
           </div>
 
           {/* Right Column — Booking Summary */}
-          <div style={{ width: "300px", minWidth: "280px", flex: "1 1 300px" }}>
+          <div style={{ width: "340px", minWidth: "280px", flexShrink: 0 }}>
             <div
               style={{
                 background: "#ffffff",
